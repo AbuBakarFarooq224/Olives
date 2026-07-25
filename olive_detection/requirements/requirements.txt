@@ -1,0 +1,39 @@
+# OliveVision — Python Dependencies
+# Install with: pip install -r requirements.txt
+
+# ── Core Deep Learning ────────────────────────────────────────
+torch>=2.1.0
+torchvision>=0.16.0
+ultralytics>=8.2.0           # RT-DETR implementation + YOLO utilities
+
+# ── Data & Augmentation ───────────────────────────────────────
+albumentations>=1.4.0        # Heavy augmentation pipeline
+opencv-python>=4.8.0         # Image/video I/O
+Pillow>=10.0.0
+numpy>=1.24.0
+scipy>=1.11.0                # Hungarian algorithm (linear_sum_assignment)
+
+# ── Visualization ─────────────────────────────────────────────
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# ── Config & Logging ──────────────────────────────────────────
+pyyaml>=6.0
+tensorboard>=2.14.0
+tqdm>=4.66.0
+
+# ── Jupyter (for training notebook) ───────────────────────────
+jupyter>=1.0.0
+ipywidgets>=8.0.0
+ipykernel>=6.0.0
+
+# ── Evaluation & Metrics ──────────────────────────────────────
+pycocotools>=2.0.7           # COCO-style mAP evaluation
+
+# ── Optional: Experiment Tracking ────────────────────────────
+# wandb>=0.16.0              # Uncomment if using Weights & Biases
+
+# ── Optional: Acceleration ───────────────────────────────────
+# onnx>=1.15.0               # For ONNX export
+# onnxruntime-gpu>=1.16.0    # For ONNX GPU inference
+# tensorrt                   # For TensorRT deployment (NVIDIA only)

@@ -1,0 +1,159 @@
+# ============================================================
+# Olive Detection & Counting System - Configuration
+# FYP Project | Architecture: RT-DETR + Custom Enhancements
+# ============================================================
+
+project:
+  name: "OliveVision"
+  version: "1.0.0"
+  description: "Real-Time Olive Detection & Counting using RT-DETR"
+  author: "FYP Student"
+
+# ─── Dataset Configuration ──────────────────────────────────
+dataset:
+  root_dir: "data/raw"
+  images_dir: "data/raw/images"
+  labels_dir: "data/raw/labels"
+  processed_dir: "data/processed"
+
+  # Class definition
+  classes: ["olive"]
+  num_classes: 1
+
+  # Split ratios
+  train_ratio: 0.70
+  val_ratio: 0.20
+  test_ratio: 0.10
+
+  # Image settings
+  image_size: 640        # Input resolution (H x W)
+  max_objects: 300       # Max olives per image
+
+# ─── Model Architecture ─────────────────────────────────────
+model:
+  name: "RT-DETR-L"               # RT-DETR Large variant
+  backbone: "ResNet-101-D"        # Deformable ResNet backbone
+  encoder: "AIFI"                 # Attention-based Intra-scale Feature Interaction
+  decoder: "RT-DETR-Decoder"      # Real-Time Detection Transformer Decoder
+  num_queries: 300                # Object queries
+  num_decoder_layers: 6
+  hidden_dim: 256
+  num_heads: 8
+  dropout: 0.0
+  pretrained: true
+  pretrained_weights: "models/pretrained/rtdetr_l_pretrained.pt"
+
+  # Custom enhancements
+  enhancements:
+    use_cbam: true              # Convolutional Block Attention Module
+    use_bifpn: true             # Bi-directional Feature Pyramid Network
+    use_iou_aware: true         # IoU-aware classification head
+    use_deformable_attn: true   # Deformable attention in decoder
+
+# ─── Training Configuration ─────────────────────────────────
+training:
+  epochs: 150
+  batch_size: 8
+  num_workers: 4
+  seed: 42
+  device: "cuda"               # "cuda" or "cpu"
+  amp: true                    # Automatic Mixed Precision
+
+  # Optimizer
+  optimizer: "AdamW"
+  learning_rate: 1.0e-4
+  weight_decay: 1.0e-4
+  betas: [0.9, 0.999]
+
+  # Learning Rate Scheduler
+  scheduler: "CosineAnnealingWarmRestarts"
+  warmup_epochs: 5
+  warmup_lr_factor: 0.01
+  min_lr: 1.0e-7
+
+  # Loss weights
+  loss:
+    cls_weight: 2.0
+    bbox_weight: 5.0
+    giou_weight: 2.0
+
+  # Early stopping
+  early_stopping:
+    enabled: true
+    patience: 20
+    monitor: "val_mAP50"
+    mode: "max"
+
+  # Gradient clipping
+  grad_clip: 0.1
+
+  # Checkpointing
+  save_dir: "models/checkpoints"
+  save_best: true
+  save_every: 10
+
+# ─── Data Augmentation ──────────────────────────────────────
+augmentation:
+  train:
+    # Geometric
+    horizontal_flip: 0.5
+    vertical_flip: 0.1
+    random_rotation: 15
+    random_scale: [0.6, 1.4]
+    mosaic: 0.8              # Mosaic augmentation (mix 4 images)
+    mixup: 0.15              # MixUp augmentation
+    copy_paste: 0.3          # Copy-paste augmentation
+
+    # Photometric
+    hsv_h: 0.015
+    hsv_s: 0.7
+    hsv_v: 0.4
+    random_brightness: 0.2
+    random_contrast: 0.2
+    gaussian_blur: 0.1
+    jpeg_compression: [75, 100]
+
+    # Advanced
+    cutout: 0.2
+    grid_distortion: 0.1
+
+  val:
+    # Only resize & normalize for validation
+    horizontal_flip: 0.0
+
+# ─── Evaluation ─────────────────────────────────────────────
+evaluation:
+  conf_threshold: 0.25
+  iou_threshold: 0.45
+  max_detections: 500
+  metrics: ["mAP50", "mAP50-95", "precision", "recall", "F1", "MAE", "RMSE"]
+
+# ─── Inference / Real-Time ──────────────────────────────────
+inference:
+  weights: "models/checkpoints/best.pt"
+  conf_threshold: 0.35
+  iou_threshold: 0.45
+  input_size: 640
+  device: "cuda"
+
+  # Video/Camera settings
+  source: 0                  # 0 = webcam, or path to video file
+  display_fps: true
+  display_count: true
+  save_output: false
+  output_path: "outputs/"
+
+  # Counting settings
+  counting:
+    use_tracking: true       # Enable ByteTrack for video counting
+    count_per_frame: true    # Show per-frame count
+    roi_enabled: false       # Region of interest counting
+    roi_coords: [0, 0, 640, 480]  # [x1, y1, x2, y2]
+
+# ─── Logging ────────────────────────────────────────────────
+logging:
+  use_wandb: false
+  project_name: "OliveVision"
+  log_every: 10
+  tensorboard: true
+  log_dir: "logs/"
