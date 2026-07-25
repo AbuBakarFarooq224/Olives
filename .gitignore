@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Model weights and binaries
+*.pt
+*.pth
+*.onnx
+*.bin
+*.ckpt
+*.h5
+*.pb
+
+# Training artifacts
+runs/
+logs/
+checkpoints/
+weights/
+output/
+dist/
+build/
+*.egg-info/
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
